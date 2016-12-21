@@ -1,0 +1,83 @@
+Vamsi Mokkapati
+404-464-206
+CS 35L Lab 6
+TA: Sharath Gopal
+
+1.
+In order to establish a trusted connection among my team’s
+host, I first had to install OpenSSH. To do that, I typed
+
+“sudo apt-get update”
+“sudo apt-get install openssh-server”
+“sudo apt-get install openssh-client”
+
+This installed both the server and client so we could both
+set up accounts on each others’ hosts. 
+
+2.
+When I was acting as the server, I typed the following to
+add my partner Shadi as the client:
+
+// Made an account for Shadi
+“sudo useradd -d /home/shadi -m shadi”
+“sudo passwd shadi” (I then made my password as “password”)
+
+// Made a .ssh directory, and gave Shadi read, write, and 
+// execution permissions for him in .ssh
+“cd /home/shadi”
+“sudo mkdir .ssh”
+“sudo chown -R shadi .ssh”
+“sudo chmod 700 .ssh”
+“ifconfig” (This gave me the IP address of my server, which
+            was 10.97.85.173)
+“ps aux | grep ssh” (This showed me a process called sshd, 
+                      also known as the ssh daemon.)
+
+3.
+When I was acting as the client, with Shadi as my server,
+I had to log in with a password, with a passphrase, and
+then without a passphrase. Then, the server (my partner)
+had to be able to run a program on my host, which displays
+on his host.
+
+To log in with my password, I typed:
+
+“ping 10.97.85.173”
+“ssh vamsi@10.97.85.173”
+
+This allowed me to be able to log in after typing out my
+password, which was “password”.
+
+To log in without my password and only my passphrase, I
+typed:
+
+“ssh-keygen” (this enabled me to create a passphrase).
+“ssh-copy-id -i vamsi@10.97.85.173”
+“ssh vamsi@10.97.85.173” (After typing this, I was able to
+                           only type in my passphrase, and 
+                           log into my account)
+
+To log in without using my passphrase, I typed:
+
+“ssh-add” (After this, I typed in my passphrase, which was
+           “passphrase”).
+“ssh vamsi@10.97.85.173” (Since I already put my passphrase,
+                           I was now able to log in without a
+                           passphrase).
+
+4.
+To log onto my neighbor’s host using port forwarding,
+I used X Session forwarding:
+
+“ssh -X vamsi@10.97.85.173”
+“xterm” (This opened another window, where I typed in my 
+         browser’s name)
+“firefox” (After doing this, my partner was able to run
+           Firefox on my host, with it displaying on his 
+           host)
+“ps aux” (This would show a list of all running processes, &
+          we confirmed through this that xterm is correctly
+          running on my partner’s host).
+
+My partner also both acted as a server and client, and when
+we switched, we used a new IP address.

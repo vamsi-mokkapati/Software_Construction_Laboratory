@@ -1,0 +1,68 @@
+Vamsi Mokkapati
+404-464-206
+CS 35L Homework 3
+TA: Sharath Gopal
+
+1. 
+The line “case_long_iso_time_style:” was removed because the goto
+statement within the for loop (line 2036) that calls it is removed later
+in the patch; therefore, it is pointless to keep the line. However, it is
+not strictly necessary to remove that line, since there is now no
+statement in the code that calls it, and it will just be ignored if not
+removed.
+
+2. 
+If my company adopts this patched version of Coreutils, I’d realize that
+the date format outputted by ls.c would be such that the months are
+written in English, and that the format of the dates would be in the
+month-day-year (MDY) format which is used primarily in the United States
+(i.e. Aug 17, 2015). Therefore some problems with my application would
+include the fact that non-English speakers would not understand what the
+date is at all, and that English speakers from other places like Europe or 
+Australia would find the MDY format to be unfamiliar, since they’re 
+accustomed to the day-month-year (DMY) format. Any future programs that
+might depend on the date format in a specific order might also crash if
+the MDY format is not used in the area.
+
+3. 
+I receive the following error when I try invoking randline.py on an empty
+file /dev/null by typing “python randline.py -n 3 /dev/null”:
+      IndexError: list index out of range
+
+I get this error stating that my list index is out of range, since the 
+randline code is supposed to output the specified number of random lines
+from a file, and using an empty file with 0 lines of text means that it
+is impossible to retrieve any nonzero amount of lines from that empty file.
+Therefore, there is an index out of bounds error, since any nonzero number
+is out of bounds, and self.lines contains no lines.   
+
+4. 
+In order to use python3, I had to go into a specific path, so I typed in
+“export PATH=$PATH:/usr/local/cs/bin”. Then, I tried using python3 to get 
+3 random lines by typing 
+“python3 randline.py -n 3 /dev/null”, and I got the following message, 
+reporting an error on line 65:
+
+  File "randline.py", line 65
+    except IOError as (errno, strerror):
+                      ^
+SyntaxError: invalid syntax
+
+The reason this error occurs when running randline on python 3 is the
+removal of a feature of the python language from the 2nd to 3rd version
+called tuple parameter unpacking. In python 2.0, there was the ability
+to put in an argument that is a sequence, as opposed to just a character;
+for example, when defining a function func:
+
+“def func(age, (firstName, lastName), gender) :”
+
+The (firstName, lastName) argument is a sequence, and the function would
+say that is an acceptable parameter in python 2.0, and it would unpack
+the tuple argument. However, due to some issues with this feature, 
+a Python Enhancement Proposal removed this feature in python 3.0, and as
+is seen in line 65 of the randline code, the tuple unpacking feature is
+required, since (errno, strerror) is a sequence. Therefore, python 3.0
+reports a syntax error.
+
+To fix this error in Python 3, the line should be changed to:
+    except IOError as err:

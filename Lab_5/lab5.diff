@@ -1,0 +1,22 @@
+2016-04-29  Vamsi Mokkapati  <vamsi@lnxsrv01.seas.ucla.edu>
+
+	* timespecmod.h (timespec_cmp): Removes the overflow value that initially goes into diff
+
+--- timespec.h	2016-04-29 17:27:56.603862000 -0700
++++ timespecmod.h	2016-04-29 22:12:40.324135000 -0700
+@@ -45,8 +45,13 @@
+ static inline int
+ timespec_cmp (struct timespec a, struct timespec b)
+ {
+-  int diff = a.tv_sec - b.tv_sec;
+-  return diff ? diff : a.tv_nsec - b.tv_nsec;
++  signed long long int diff = (signed long long int) a.tv_sec - (signed long long int) b.tv_sec;
++  if (diff == 0) {
++    return 0;
++  }
++  else {
++    return diff > 0 ? 1 : -1;
++  }
+ }
+ 
+ # if ! HAVE_DECL_NANOSLEEP

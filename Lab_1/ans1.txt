@@ -1,0 +1,117 @@
+Vamsi Mokkapati
+404-464-206
+CS 35L, Lab 1
+TA: Sharath Gopal
+
+1. “man -K” followed by the specified word
+
+I typed “man man” to find all the options for the man
+command, and I found that the -K option searches for 
+specific strings in all man pages.
+
+2. cp is located in /bin and wc is located in /usr/bin
+
+I typed in “whereis cp” and “whereis wc” to find where
+the programs are located in the file system.
+
+3. The executable programs that are one character long
+are w, X, and [.
+w stands for “who” and shows who’s logged in, and their
+activities. X illustrates a portable system that runs on 
+many graphics machines. Lastly, the [ illustrates a 
+“test” builtin that sees what type of files are present
+and compares values.
+
+4. /etc/alternatives/emacs
+
+First, I changed directories into /usr/bin by typing
+cd /usr/bin. Then I listed all the files by typing
+ls -l, searched for “emacs”, and found that there is 
+a symbolic link pointing to the file actually being
+executed, which is /etc/alternatives/emacs.
+
+5. g+s,o-x means that users in the group will be able
+to set a user or group ID on execution, and that users
+in “other” (or users who are not the file’s group) will
+NOT be able to execute the file.
+
+I found this information by typing in “man chmod”
+
+6. -mtime -21
+
+Typing in “man find” helped me find that the -mtime
+option is to help tell me the file modified time. Typing
+in another option -n will tell me if a file has been 
+modified in n days. Since 3 weeks is 21 days, I typed out
+-mtime -21.
+
+7. The modified directories include:
+.
+./Desktop
+./Documents
+./Downloads
+./.emacs.d/auto-save-list
+
+I typed in “find -type d -mtime -21”, since -type d indicates
+that I’m looking for directories, and -mtime -21 shows that
+they should have been modified in the past 21 days. I found
+all this through “man find”.
+
+8. There are 353 symbolic links in the /usr/bin directory, which
+is where find is located.
+
+First to locate find's directory I typed "whereis find" and found
+that it was in /usr/bin. After typing "man find" I found that the
+option -type l will give me all the symbolic links, so I typed
+find -type l after changing directories to /usr/bin, and put the
+result into symlinks.txt. I typed wc -l on symlinks.txt to find 
+there were 353 symbolic links.
+
+9. libICE.so.6.3.0
+
+I typed "man ls" and found that the -t option would list the files
+in order of the newest to oldest, so I changed directories and typed
+cd /usr/lib, and then typed in "ls -lt". libICE.so.6.3.0 was last 
+modified at November 19, 2009.
+
+10. locale gets its data from LC_* environment variables, and 
+summarizes the current locale environment based on them.
+
+I typed "man locale" to find this information. 
+
+11. sort-lines, sort-paragraphs, sort-pages, sort-fields, 
+sort-numeric-fields, sort-columns
+
+I entered emacs, and found that C-h r would give me the manual.
+I searched for "sort" by typing C-s, entered the sorting page,
+and found all the commands with sort in their name.
+
+12. 
+C-M-a: Go the beginning of a current or preceding top-level major 
+definition (defun)
+C-M-b: Move backward over an expression that's balanced
+C-M-c: Exit the recursive edit and go back to the unfinished command
+C-M-d: Go to the next open parentheses or bracket.
+C-M-e: Go to the end of a current or next defun
+C-M-f: Move forward over an expression that's balanced
+C-M-g: Rehighlights a range of lines. Sometimes refontifies an entire
+current function.
+C-M-h: Put a region around the whole current or next defun; mark
+function.
+
+13. C-g aborts a command safely. What that means is that it quits or 
+cancels a command before it has finished running, and it also stops 
+running any commands that are partially typed. This can be easily 
+found by experimenting with the C-g command on the Emacs editor. 
+
+14. The yank function basically works in a similar way to the Paste
+option on a Microsoft Word editor. It does this by typing out the 
+most recently deleted text from the kill ring. This information can
+be obtained from typing out the command C-y and experimenting with
+the Emacs editor.
+
+15. The dired command is different from the ls -l command in that 
+you can operate on files and do things such as deleting files, and
+flagging files based on their names using it. The ls -l command is
+different since it's a read-only command, and you cannot modify the
+files in a directory with it.

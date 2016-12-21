@@ -1,0 +1,230 @@
+Vamsi Mokkapati
+404-464-206
+CS 35L Lab 4
+TA: Sharath Gopal
+
+1. 
+First, I made a “gitroot” directory, and changed directories 
+into there, where I could obtain a copy of the Diffutils 
+directory: “mkdir gitroot” followed by “cd gitroot”
+
+In order to get a copy of the existing Diffutils repository, 
+I typed in “git clone git://git.savannah.gnu.org/diffutils.git”.
+I referred to the lecture slides to find out that “git clone”
+gets a copy of an existing repository.
+
+2.
+Then I went into the Diffutils directory (“cd diffutils”).
+
+In order to use the “git log” command to make a file that 
+contains changes to the Diffutils’ master branch, I used
+the “>” operator and typed out “git log > git-log.txt”.
+
+3.
+To generate a list of tags used for Diffutils, I used the 
+git tag command, and used the “>” operator to put the list
+into git-tags.txt: “git tag > git-tags.txt”.
+
+4.
+In order to search for my commit, I typed “git log”, and then
+searched for “like this” using the forward slash to search;
+I found the hash of the commit in yellow:
+“62ca21c8c1a5aa3488589dcb191a4ef04ae9ed4f”.
+
+I then recalled that the “git show” command, which shows what
+changes were made during the commit, and typed the following
+to obtain my quote-patch.txt:
+
+“git show 62ca21c8c1a5aa3488589dcb191a4ef04ae9ed4f >
+quote-patch.txt”
+
+5.
+To check out version 3.0 of Diffutils from my repository, I
+typed out “git checkout v3.0 -b newbranch”, which created
+another branch called newbranch that would retain the 
+commits I created.
+
+6.
+To figure out how to use the patch command, I typed out 
+“man patch”, and after figuring out how to use the “-pnum” flag,
+I typed out “patch -p1 < quote-patch.txt”.
+
+It couldn’t figure out which file to patch at 3 separate 
+instances, all of which I skipped through.
+
+Some problems I had in applying the patch included certain hunks
+failing, as the output showed me:
+
+2 out of 3 hunks FAILED -- saving rejects to file README.rej
+1 out of 1 hunk FAILED-- saving rejects to file README-hacking.rej
+1 out of 1 hunk FAILED -- saving rejects to file cfg.mk.rej
+3 out of 14 hunks FAILED -- saving rejects to file src/diff.c.rej
+1 out of 9 hunks FAILED -- saving rejects to file src/diff3.c.rej
+
+7.
+After typing “git status”, I received an overview of all the files 
+that got changed:
+
+HEAD detached at v3.0
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working 
+  directory)
+
+        modified:   NEWS
+        modified:   README
+        modified:   TODO
+        modified:   doc/diagmeet.note
+        modified:   ms/config.bat
+        modified:   ms/config.site
+        modified:   po/en.po
+        modified:   src/analyze.c
+        modified:   src/cmp.c
+        modified:   src/context.c
+        modified:   src/diff.c
+        modified:   src/diff.h
+        modified:   src/diff3.c
+        modified:   src/dir.c
+        modified:   src/ifdef.c
+        modified:   src/io.c
+        modified:   src/sdiff.c
+        modified:   src/side.c
+        modified:   src/system.h
+        modified:   src/util.c
+        modified:   tests/help-version
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+        NEWS.orig
+        README-hacking.orig
+        README-hacking.rej
+        README.orig
+        README.rej
+        cfg.mk.orig
+        cfg.mk.rej
+        git-log.txt
+        git-tag.txt
+        ms/config.site.orig
+        quote-patch.txt
+        src/cmp.c.orig
+        src/context.c.orig
+        src/diff.c.orig
+        src/diff.c.rej
+        src/diff.h.orig
+        src/diff3.c.orig
+        src/diff3.c.rej
+        src/dir.c.orig
+        src/sdiff.c.orig
+        src/system.h.orig
+        src/util.c.orig
+        tests/help-version.orig
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+8.
+After learning the Emacs commands, I figured that C-x v = would 
+let me know all the places where the back tick would have to be
+changed into an apostrophe, while the command C-x v u would 
+actually revert the files, once I’m in vc-diff mode.
+
+9.
+First, I looked at all the files that were not C files, and I 
+reverted them by opening them on emacs (i.e “emacs NEWS”), typing
+C-x v = (to open vc-diff), typing C-x v u (to revert), typing 
+“yes”, and hitting Enter. 
+
+Then, I found that that I had to modify the C files by applying the
+hunk which changed all the back ticks to apostrophes, and then 
+going through the code to change some of the apostrophes back into 
+back ticks whenever the segment of code was commented out. For each 
+of the C files, I first typed C-x v = (to open vc-diff), typed in 
+C-c C-a to apply the hunk, and then typed in C-c C-c on every 
+red/green highlighted line in diff to find the line in the code, 
+and determine whether or not I should leave the apostrophe there 
+depending on if the code is a comment or not. 
+
+10.
+After looking at all my files and directories in diffutils (ls), 
+and going into the src directory (cd src), I found that the only 
+files that contained the suffix .c.rej were diff.c.rej and 
+diff3.c.rej. After making copies of both those reject files within
+my desktop, I then compared diff.c and diff3.c side by side with 
+their respective reject files, and used the Emacs command
+M-g g [Line #] to jump to the specified lines found in the reject
+files. I then replaced all the remaining back ticks in the
+diff files with apostrophes.
+
+11.
+I knew from lecture that I have to use the “git clean” command
+to remove untracked files, and I wanted to find out more about the
+command, so I typed in “man git-clean”. I then found out that the
+“-f” flag would forcibly remove the untracked files, and therefore
+typed out the command “git clean -f” to remove all the untracked
+files after changing directories back into diffutils from src. 
+
+12.
+I then typed in “git status”, and found that there were six files
+that were modified, which is as expected. Then, in order to 
+put the output of “git diff” into quote-3.0-patch.txt, I typed
+in git diff > quote-3.0-patch.txt. In order to make sure the patch
+is 300-400 lines long, I type in “wc -l quote-3.0-patch.txt”, and 
+find that it is 344 lines long, which matches my expectations.
+
+13.
+After going through README-hacking, I figured out that once I make
+sure the path is in usr/local/cs/bin, I can type out “./bootstrap”
+and then type “./configure” followed by “make” to build the
+modified version of Diffutils. To test “diff . -“, I changed
+directories into src (“cd src”), and them typed out “diff . -“. 
+As a result I got the following line of text as an output:
+
+“diff: cannot compare '-' to a directory”
+
+This shows our patch worked, since there is no back tick around 
+the dash. 
+
+Then I typed out “diff --help”, looked through the
+resulting lines which showed all the options for the diff
+command, and found there were no back ticks present, which 
+illustrates my modification of diff.c and diff3.c were successful.
+
+14.
+In order to do my sanity test, I first had to copy my former
+source code into diffutils-3.0, and my latter one into 
+diffutils-3.0-patch. I first made my directories:
+
+“mkdir diffutils-3.0”
+“mkdir diffutils-3.0-patch”
+
+In order to copy my former source code, I 
+simply got another copy of the existing Diffutils repository
+from the Savannah website:
+
+“git clone git://git.savannah.gnu.org/diffutils.git diffutils-3.0”
+
+Then I went made sure to check out version 3.0 of diffutils
+(“git checkout v3.0”), and then put my modified source code into
+diffutils-3.0-patch:
+
+“cp -r ../diffutils-3.0-patch/“
+
+I realized I had to copy my source code into the diffutils-3.0-
+patch directory, so I knew I had to use the “cp” command. I typed
+in “man cp”, and found that the “-r” flag recursively copies
+content into the specified directory, so I decided to use it.
+
+Then I simply applied the given code to run my implementation of 
+diff:
+
+“diffutils-3.0-patch/src/diff -pru diffutils-3.0 diffutils-3.0-
+patch >quote-3.0-test.txt”
+
+15.
+After using diff to compare the contents of quote-3.0-test.txt
+and quote-3.0-patch.txt, I realized that the files are not
+identical, and the differences are not innocuous, since there are
+changes in characters between double quotes, or string literals.
+The reason why the two text files aren’t identical is because of
+modifications I made by hand to the .c files which changed string
+literals.

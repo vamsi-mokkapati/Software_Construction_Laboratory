@@ -1,0 +1,150 @@
+Vamsi Mokkapati
+404-464-206
+CS 35L Lab 5
+TA: Sharath Gopal
+
+1.
+I realized that I should first download the coreutils with the
+bug in the ls program, so I used the wget command:
+
+“wget http://web.cs.ucla.edu/classes/fall15/cs35L/assign/
+coreutils-with-bug.tar.gz”
+
+I obtained the web address for the buggy coreutils program by
+going into my browser and selecting “Copy Link Address”, which
+I then pasted onto the Linux Server.
+
+2.
+I noticed that I just downloaded a tarball I had to unzip, so 
+to do that, I typed in “man tar” to find out the options for
+the tar command. I realized that I should type “-xzvf”, since
+those 4 options stand for extract, gzip, verbose, and file in
+that order. So I typed in
+
+tar -xzvf coreutils-with-bug.tar.gz
+
+3.
+To build the old version of coreutils as-is, I first changed
+directories into coreutils-with-bug (“cd coreutils-with-bug”),
+and to build it, I followed the instructions from the
+README-hacking text, and typed in “./configure” followed by
+“make”. 
+
+I noticed that once it finished running, I received 4 errors,
+2 of them titled “Error 1”, and the other 2 titled “Error 2”.
+The first error was for a specific object file utimecmp.o, 
+while the other three were either errors in [all] or
+[all-recursive]. 
+
+These errors were due to conflicting types for a function 
+called “futimens”. 
+
+4.
+To build the old version of coreutils with the renaming patch
+applied, I first had to download the patch from online. So I
+first copied the link address from the website, and used the 
+wget command:
+
+wget http://web.cs.ucla.edu/classes/fall15/cs35L/assign/
+coreutils.diff
+
+Then, to apply the patch coreutils.diff to the buggy older 
+version, I checked to see if I was in the coreutils-with-bug
+directory, and then applied the patch:
+
+patch -p0 < coreutils.diff
+
+5. 
+After typing in “make” again, I didn’t receive any errors
+this time around.
+
+The renaming patch fixed the errors, since it changed instances
+of “futimens” into “coreutils_futimens”, hence making sure 
+there was no conflict in the type of function futimens was.
+There was an error when “futimens” was used since it was 
+probably declared somewhere else on the SEASnet servers. 
+Also, the function “tee” was changed to coreutils_tee, thus
+specifying its type, and removing the errors.
+
+6. 
+To reproduce the problem, I followed the example commands 
+specified in the spec. After making and changing directories
+into my tmp directory, I made the wwi-armistice, now, and now1
+files. Then I changed directories back into src by typing
+“cd ~/coreutils-with-bug/src” and then typing
+“./ls -lt /tmp/tmp.V8mEjWeqK2”. The bug appeared as expected:
+
+-rw-r--r-- 1 vamsi csugrad 0 1918-11-11 03:00 wwi-armistice
+-rw-r--r-- 1 vamsi csugrad 0 2016-04-28 21:09 now1
+-rw-r--r-- 1 vamsi csugrad 0 2016-04-28 21:09 now
+
+Here, the wwi-armistice file appears to be in the future 
+according to how ls -lt outputs the files.
+
+7.
+To fix the problem, I first went into ls.c, activated gdb
+(using “M-x gdb”), ran ls, and set a breakpoint at sort_files.
+Using gdb’s step-in function, I noticed that the comparing 
+function compare_mtime is where the error would have most likely
+occurred, since it compares in accordance to time. Stepping
+into the comparing functions, I found that compare_mtime calls
+cmp_mtime, which in turn calls timespec_cmp.
+
+In the timespec_cmp function in the timespec.h header file, 
+I found that an overflow occurs when an old file like 
+wwi-armistice is compared with a recent file like now or now1.
+To fix this, I made diff, a.tv_sec, and b.tv_sec into signed
+long long ints, which in C are 64 bits in size. Then, in 
+accordance to how the compare function works, I made sure 
+the function returned 0 if diff was 0, 1 if diff was greater 
+than 0, and -1 if diff was less than 0.
+
+After making all the modifications in a copy of the timespec.h
+file that I called timespecmod.h, I made my diff file by 
+typing “diff -u timespec.h timespecmod.h > lab5noCL.diff”.
+Then I went into lab5noCL.diff, typed in C-x 4 a in 
+emacs, and made a ChangeLog entry. To make my final diff file,
+I simply concatenated my diff file with my change log by 
+typing “cat ChangeLog lab5noCL.diff > lab5.diff”.
+
+To check to see if my diff file works, I made a new
+directory, downloaded coreutils-with-bug again, applied my
+lab5.diff patch within coreutils-with-bug/lib, configured
+and made it, and tested with the example code. I obtained the
+following result obtained as a result of my patch, with the 
+wwi-armistice file being correctly put on the bottom:
+
+-rw-r--r-- 1 vamsi csugrad 0 2016-04-29 22:40 now1
+-rw-r--r-- 1 vamsi csugrad 0 2016-04-29 22:39 now
+-rw-r--r-- 1 vamsi csugrad 0 1918-11-11 03:00 wwi-armistice
+
+8.
+When I tried reproducing the problem on my home directory on
+the SEASnet Linux servers, I obtained the following result:
+
+-rw-r--r-- 1 vamsi csugrad 0 2054-12-17 17:28:16.000000000 +0000 
+wwi-armistice
+-rw-r--r-- 1 vamsi csugrad 0 2016-04-30 06:05:15.146948000 +0000 
+now1
+-rw-r--r-- 1 vamsi csugrad 0 2016-04-30 06:05:09.215740000 +0000 
+now
+
+The reason why SEASnet projects the wwi-armistice file to be
+far in the future, in the year 2054, is because of the different
+time stamps that different servers use. Timestamps are 
+represented as the number of seconds since the Unix Epoch time,
+which was on midnight of January 1st, 1970. When we make the
+$tmp directory, it is on a local disk on the server, which 
+uses 64-bit signed time stamps. Therefore, the large negative
+number that is representative of the wwi-armistice file (negative
+because it has a date before long before 1970) is represented
+correctly in $tmp. 
+
+However, the home directory is located on the Network File
+System (NFS), which uses 32-bit unsigned timestamps. Therefore,
+since the stamp has to convert from 64 to 32 bits, the most
+significant 32 bits (which contain the sign info) get cut off
+and get replaced by 0’s, and the result is read as a positive
+number by NFS. Therefore, the date is interpreted to be much
+LATER than 1970 instead of before it, and the year 2054 is the
+date in the future that results as wwi-armistice’s timestamp.

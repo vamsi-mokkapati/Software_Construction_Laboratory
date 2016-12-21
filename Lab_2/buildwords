@@ -1,0 +1,31 @@
+#!/bin/bash
+
+    # only look at characters in between HTML td tags
+    grep "<td>.*</td>" $1 | \
+
+    # translate all uppercase letters to lowercase
+    tr '[:upper:]' '[:lower:]' | \
+
+    # Get rid of all the <u> tags
+    sed 's/<u>//g' | \
+
+    # Get rid of all the </u> tags. The "/" has to be escaped.
+    sed 's/<\/u>//g' | \
+
+    # Change all ASCII grave characters to apostrophes
+    tr "\`" "\'" | \
+
+    # Replace all commas and spaces with newlines
+    sed 's/[ ,]/\n/g' | \
+
+    # Remove anything in between < and >
+    sed 's/<[^>]*>//g' | \
+
+    # Output only words containing Hawaiian characters
+    grep -v "[^pk\'mnwlhaeiou]" | \
+
+    # Sort remaining output
+    sort -u | \
+
+    # Delete any lines that remain empty
+    sed '/^$/d'

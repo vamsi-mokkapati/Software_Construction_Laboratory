@@ -1,0 +1,151 @@
+Vamsi Mokkapati
+404-464-206
+CS 35L, Lab 2
+TA: Sharath Gopal
+
+First, I made sure I was in the C locale by typing out
+“export LC_ALL=‘C’”.
+
+Next I typed “sort /usr/share/dict/words > ~/words” to sort the
+contents of the words file and put into a file named words in 
+my present working directory.
+
+To make a text file containing the HTML in the assignment’s web
+page, I typed
+“wget http://web.cs.ucla.edu/classes/spring16/cs35L/assign/
+assign2.html”.
+
+1. “tr -c 'A-Za-z' '[\n*]' < assign2.html”
+
+This commands outputs the contents of assign2.html with only
+one word or newline per line. This command takes any 
+non-alphabetic character and translates it into a newline, 
+including newlines themselves. The “-c” flag stands for 
+complement, which in this case means anything EXCEPT alphabetic
+characters ‘A-Za-z’.
+
+2. “tr -cs 'A-Za-z' '[\n*]' < assign2.html”
+
+This outputs the contents of assign2.html with one word per 
+line. Unlike the previous command, this outputs no empty lines,
+since the “-s” option squeezes repeats (in this case, repeats
+of newlines). This means that the number of newlines between
+words in the document doesn’t affect the output.
+
+3. “tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort”
+
+This outputs the contents of assign2.html with one word per
+line, sorted alphabetically according to ASCII representation.
+This has the same output as the previous command, except the
+lines are sorted.
+
+4. “tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort -u”
+
+This outputs assign2.html with one word per line, sorted
+alphabetically according to ASCII representation with any
+repeated words being omitted. This has the same output as the
+previous command, except that there are no repeats of words.
+
+5. “tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort -u | 
+    comm - words”
+
+This command compares two sorted files (the output of the
+previous command and the words file) and outputs three columns.
+The first column has lines unique to assign2.html, the second
+column has lines unique to words, and the third column con-
+tains words in both files.
+
+6. “tr -cs ‘A-Za-z’ ‘[\n*]’ < assign2.html | sort -u |
+    comm -23 - words”
+
+This commands omits columns 2 and 3 from the output above, and
+therefore only outputs words that are ONLY in assign2.html, and
+NOT in words. 
+
+_______________________________________________________________
+
+First, I wanted to ignore all lines that didn’t have any 
+relevant words in them, so I typed out “grep “<td>.*</td>” $1”,
+since I only wanted to look at words in between the HTML td
+tags. I put the “$1” because I needed to use the first input
+of the command (in this case, hwnwdseng.htm) as input for my
+grep. Then I used the translate “tr” command to change all
+uppercase letters to lowercase, used sed to get rid of <u>
+and </u> and used tr to change all ASCII grave accents to 
+apostrophes. To make sure any commas and spaces between words
+would separate them, I used sed to replace any commas or 
+spaces with a newline. To delete anything in between < and >,
+I typed out “sed 's/<[^>]*>//g’”, which would first look for a
+<, and then find as many non-“>” characters as it can before
+a final >. 
+
+To remove all english words, I explored the grep options 
+through its man page, and found that the “-v” option selects
+only non-matching lines; therefore, I put that option for
+all the characters excluding the given hawaiian characters.
+Lastly, I sorted the words without duplicates and removed
+any empty lines at the end.
+
+Here is my resulting buildwords script:
+
+#!/bin/bash
+
+    # only look at characters in between HTML td tags
+    grep "<td>.*</td>" $1 | \
+
+    # translate all uppercase letters to lowercase
+    tr '[:upper:]' '[:lower:]' | \
+
+    # Get rid of all the <u> tags
+    sed 's/<u>//g' | \
+
+    # Get rid of all the </u> tags. The "/" has to be escaped.
+    sed 's/<\/u>//g' | \
+
+    # Change all ASCII grave characters to apostrophes
+    tr "\`" "\'" | \
+
+    # Replace all commas and spaces with newlines
+    sed 's/[ ,]/\n/g' | \
+
+    # Remove anything in between < and >
+    sed 's/<[^>]*>//g' | \
+
+    # Output only words containing Hawaiian characters
+    grep -v "[^pk\'mnwlhaeiou]" | \
+
+    # Sort remaining output
+    sort -u | \
+
+    # Delete any lines that remain empty
+    sed '/^$/d'
+
+As far as I can tell, my script has no bugs.
+
+To check all the misspelled Hawaiian words, this is my script:
+
+“cat assign2.html | tr ‘[:upper:]’ ‘[:lower:]’ | tr -cs ‘a-z’
+‘[\n*]’ | sort -u | comm -23 - hwords > badHawaiian.txt”
+
+After checking with my Hawaiian spell checker, I found there
+are 401 misspelled Hawaiian words on the assignment web page.
+
+To check all the misspelled English words, this is my script:
+“cat assign2.html | tr ‘[:upper:]’ ‘[:lower:]’ | tr -cs ‘a-z’
+‘[\n*]’ | sort -u | comm -12 - hwords > badEnglish.txt”
+
+After checking with my English spell checker, I found there
+are 11 misspelled English words on the assignment web page.
+
+For my Hawaiian checker, the words on the web page that are
+not in hwords are in column 1, so I put “comm -23”. For my 
+English checker, the words that are misspelled in English
+are in both hwords and the webpage, which is in column 2,
+so I put “comm -12”.
+
+Words “misspelled” as English, but not as Hawaiian include
+“halau”, “kula”, and “lau”.
+
+Words “misspelled” as Hawaiian but not as English include most
+words on the page, including “accent”, “address” and
+“arguments”.

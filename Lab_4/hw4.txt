@@ -1,0 +1,72 @@
+Vamsi Mokkapati
+404-464-206
+CS 35L Homework 4
+TA: Sharath Gopal
+
+1. -
+
+2.
+In order to check out version 3.0 into a new branch named “quote”,
+I typed “git checkout v3.0 -b quote”
+
+3.
+To run the patch quote-3.0.txt, I ran the “patch” command by 
+typing “patch -p1 < ../quote-3.0-patch.txt” since the patch file
+was located in my home directory. I used the -p1 option
+again, since I learned that the “-pnum” option will skip “num”
+leading slashes from the patch file’s name, and in this case,
+it’s necessary to skip 1 slash.
+
+4.
+I learned that typing C-x 4 a would add material to the ChangeLog
+for each file I applied it to.
+
+5.
+To make my ChangeLog entry for my patch, I simply went to all my
+modified files listed in my quote-3.0-patch.txt (cmp.c, diff.c,
+diff3.c, dir.c, sdiff.c and util.c) and put down the changes in 
+the ChangeLog using the C-x 4 a command.
+
+6.
+To make sure I commit my changes to my “quote” branch, I knew I 
+needed to use the “git commit” command, so I went to 
+“man git-commit” to see how it worked. I typed out “git add .”
+to add a new commit, and then typed 
+“git commit --file=src/ChangeLog” to commit all 6 of my modified
+files.
+
+7.
+In order to generate my formatted-patch.txt, I used the
+“git format-patch” command, and made sure its output went into 
+the correct text file by using the “stdout” flag. To find out how
+to get it to output the correct text, I typed in
+“man git-format-patch”:
+
+“git format-patch --stdout > formatted-patch.txt”
+
+8.
+My partner for this section of the homework is Shadi Aranki, and
+to test his formatted-patch.txt, I typed out
+“git checkout v3.0 -b partner” followed by 
+“git am formatted-patch.txt” to apply the formatted patch.
+Next, I built the resulting modified version of Diffutils by
+typing “./bootstrap”, “./configure”, “make”, and “make check”.
+I found out that his patch worked as expected.
+
+9.
+In order to make sure my ChangeLog entry worked, I ran the 
+command “make distdir”. Then, to see my ChangeLog entry, I simply
+went into my “src” folder by going into diffutils, and typing in
+“cd src”, and then typing “cat ChangeLog”. After going through my
+ChangeLog, I noticed that the changes I made were at the beginning
+of the file.
+
+10.
+In order to go into the directory specified in the instructions, 
+I just typed out “cd ~eggert/src/gnu/emacs”. Since the “gitk” 
+command is stored in usr/local/cs/bin, I exported the path to 
+illustrate that: “export PATH=/usr/local/cs/bin:$PATH”. Then,
+I typed in the “gitk” command. I found that the newest merge that
+is not newer than 2015-01-25 is lisp/gnus/nnimap.el authored by 
+Trevor Murphy and committed by Katsumi Yamaoka. It allows people 
+to use Google X-GM-LABELS if it is present.

@@ -1,0 +1,28 @@
+Vamsi Mokkapati
+404-464-206
+CS 35L Gitk Description 
+TA: Sharath Gopal
+
+The top left subwindow has a large list of patches, and
+lists out a brief description of what the patch allows the
+user to do. The colored lines on the left show which
+branches the patches are on.
+
+The top middle subwindow lists the authors and their emails
+for the corresponding patches on the top left.
+
+The top right subwindow on top shows the date at which the 
+patch was created or last modified.
+
+The middle left subwindow reiterates and adds more information
+about the patch’s contributors, and gives the more detailed
+names for its parent and child. It also gives more detailed
+information on which specific branches the patch is available
+on. It again reiterates the brief description of what the
+patch does.
+
+The bottom right subwindow is reserved for comments.
+
+The bottom left subwindow is a ChangeLog the contributor
+created, detailing his or her notes and comments about the
+patch.

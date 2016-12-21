@@ -1,0 +1,79 @@
+#!/bin/bash
+
+dir=$1
+cd $dir
+DOTRESULT=$(ls -a .[^.]* | sort) # only contains files starting with a dot.
+REGRESULT=$(ls | sort)           # only contains files NOT starting with a dot.
+
+declare -a DOTARRAY
+declare -a REGARRAY
+
+IFS=$'\n'
+
+# DOTARRAY now has to contain all files starting with a dot, sorted.
+
+let cntDot=0;
+for FILE in $DOTRESULT
+do
+    if [ ! -L "$FILE" && -f "$FILE" ];
+    then
+        echo "$FILE is a regular file"
+        DOTARRAY[$cntDot]="$FILE";
+        let cntDot=cntDot+1;
+    else
+        echo "$FILE is NOT a regular file"
+    fi
+done
+
+# REGARRAY now has to have all the other files without a preceding dot, sorted.
+
+let cntReg=0;
+for FILE in $REGRESULT
+do
+    if [ ! -L "$FILE" && -f "$FILE" ];
+    then
+        echo "$FILE is a regular file"
+        REGARRAY[$cntReg]="$FILE";
+        let cntReg=cntReg+1;
+    else
+        echo "$FILE is NOT a regular file"
+    fi
+done
+
+# Now, we have to combine these two sorted arrays and put it in
+# a final array with files that have preceding dots coming first.
+
+declare -a FINALARRAY
+let cnt=0
+
+for((x=0; x < cntDot; x++))
+do
+    FINALARRAY[$x]=${DOTARRAY[$x]}
+    let cnt=cnt+1
+done
+
+for((x=cntDot; x < cntDot+cntReg; x++))
+do
+    FINALARRAY[$x]=${REGARRAY[$x-cntDot]}
+    let cnt=cnt+1
+done
+
+for((x=0; x < cnt; x++))
+do
+    for((y=x+1; y < cnt; y++))
+    do
+        # Compare contents of the files. The "--" will make the
+        # command stop parsing command line options, and make
+        # any file starting with a dash "-" be recognized.
+        cmp -s -- "${FINALARRAY[$x]}" "${FINALARRAY[$y]}"
+
+        # cmp will return 0 if the files have the same contents
+        if [ $? -eq 0 ]
+        then
+            # The second file is removed, and a hard link is made.
+            storedContent="${FINALARRAY[$y]}"
+            rm -- "${FINALARRAY[$y]}"
+            ln -f -- "${FINALARRAY[$x]}" "$storedContent"
+        fi
+    done
+done

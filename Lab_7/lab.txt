@@ -1,0 +1,194 @@
+Vamsi Mokkapati
+404-464-206
+CS 35L Lab 7
+TA: Sharath Gopal
+
+1. 
+To write my tr2b.c program, I first made sure that only two input
+arguments were put in by making sure a message was printed through
+standard error if argc wasn’t equal to 3 (since the 3 arguments would
+be ./tr2b, the first string, and then the second).
+
+Then, I made sure to return an error if both the input strings weren’t
+of the same length, and then I made sure to check for duplicates in the
+first string by writing a nested for loop that checks every pair of
+letters.
+
+Lastly, I implemented the simplified tr function by iterating through
+all the characters in the input file, and comparing each character
+with all the characters in the first input string. If the character
+matched a character in the first input string, I used putchar to
+put the mapped character from the second input string. Otherwise,
+I’d put the character as is.
+
+2.
+My tr2u.c file is almost identical to tr2b.c, except for a few minor
+changes to use read and write to transliterate bytes instead of
+getchar and putchar. Instead of using "c = getchar()", I used
+"pos = read(0, &c, 1)" in order to obtain a character; instead of putchar,
+I used "write(1, &c, 1)". Since the end of file would be indicated if the
+return value of the read function is less than 0, I replaced the while
+condition "c != EOF" with "pos > 0".
+
+3.
+To make a file bigfile.txt that contains at least 5,000,000 bytes, I used 
+the following command:
+
+"head --bytes=5000000 /dev/urandom > bigfile.txt"
+
+*********************************************************************************
+
+System Calls for Buffered, One File to Another:
+Command:
+"strace -o strace_bf_output -c ./tr2b 'abc' 'xyz' < bigfile.txt > bufFile.txt"
+Output:
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.000059          30         2           read
+  0.00    0.000000           0         1           write
+  0.00    0.000000           0         2           open
+  0.00    0.000000           0         2           close
+  0.00    0.000000           0         4           fstat
+  0.00    0.000000           0        10           mmap
+  0.00    0.000000           0         3           mprotect
+  0.00    0.000000           0         1           munmap
+  0.00    0.000000           0         1           brk
+  0.00    0.000000           0         1         1 access
+  0.00    0.000000           0         1           execve
+  0.00    0.000000           0         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.000059                    29         1 total
+
+Number of Calls:
+Looking at the file strace_bf_output tells us that for the buffered 
+output when copying one file to another, there are 29 system calls.
+________________________________________________________________________________
+System Calls for Unbuffered, One File to Another:
+Command:
+"strace -o strace_unbf_output -c ./tr2u 'abc' 'xyz' < bigfile.txt > unbufFile.txt"
+Output:
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 57.39    0.672318           0   5000000           write
+ 42.61    0.499160           0   5000002           read
+  0.00    0.000000           0         2           open
+  0.00    0.000000           0         2           close
+  0.00    0.000000           0         2           fstat
+  0.00    0.000000           0         8           mmap
+  0.00    0.000000           0         3           mprotect
+  0.00    0.000000           0         1           munmap
+  0.00    0.000000           0         1           brk
+  0.00    0.000000           0         1         1 access
+  0.00    0.000000           0         1           execve
+  0.00    0.000000           0         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00    1.171478              10000024         1 total
+
+Number of Calls:
+For the unbuffered output when copying one file to another, there are about 
+10,000,024 system calls. Compared to the method using the buffering technique,
+this uses almost 350,000 times more system calls because the unbuffered way
+uses a read and write system call for each and every byte while the buffered
+way stores about 65 kilobytes into a buffer before reading and writing all of
+them at once; therefore, much fewer system calls are made using the buffering
+technique.
+________________________________________________________________________________
+System Calls for Buffered, Copying File to Terminal:
+Command:
+"strace -o strace_bt_output -c ./tr2b 'abc' 'xyz' < bigfile.txt"
+Output:
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+  0.00    0.000000           0         2           read
+  0.00    0.000000           0         1           write
+  0.00    0.000000           0         2           open
+  0.00    0.000000           0         2           close
+  0.00    0.000000           0         4           fstat
+  0.00    0.000000           0        10           mmap
+  0.00    0.000000           0         3           mprotect
+  0.00    0.000000           0         1           munmap
+  0.00    0.000000           0         1           brk
+  0.00    0.000000           0         1         1 access
+  0.00    0.000000           0         1           execve
+  0.00    0.000000           0         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.000000                    29         1 total
+
+Number of Calls:
+Looking at the file strace_bt_output tells us that for the buffered
+output when copying the file to the terminal, there are 29 system
+calls made. It can be observed that there are the same number of 
+system calls needed to copy the file to the terminal compared to the 
+amount of calls to copy from one file to another; this can be 
+attributed to the fact that additional system calls needed to 
+print to the terminal screen were placed in a buffer and executed
+using the same number of system calls overall.
+________________________________________________________________________________
+System Calls for Unbuffered, Copying File to Terminal: 
+Command:
+"strace -o strace_unbt_output -c ./tr2u 'abc' 'xyz' < bigfile.txt"
+Output:
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+ 55.84    0.328637           0   5594553           write
+ 44.16    0.259911           0   5594555           read
+  0.00    0.000013           4         3           mprotect
+  0.00    0.000000           0         2           open
+  0.00    0.000000           0         2           close
+  0.00    0.000000           0         2           fstat
+  0.00    0.000000           0         8           mmap
+  0.00    0.000000           0         1           munmap
+  0.00    0.000000           0         1           brk
+  0.00    0.000000           0         1         1 access
+  0.00    0.000000           0         1           execve
+  0.00    0.000000           0         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.588561              11189130         1 total
+
+Number of Calls:
+For the unbuffered output when copying a file to the terminal, there are
+about 11,189,130 system calls. When comparing this value to the
+number of system calls when copying one file to another, more system
+calls are required to copy a file to the terminal due to the additional
+calls required to print to the terminal screen.
+________________________________________________________________________________
+4.
+Time for Buffered, One File to Another:
+Command:
+"time ./tr2b 'abc' 'xyz' < bigfile.txt > bufFile.txt"
+Output:
+real	0m0.004s
+user	0m0.000s
+sys	0m0.001s
+
+Time for Unbuffered, One File to Another:
+Command:
+"time ./tr2u 'abc' 'xyz' < bigfile.txt > unbufFile.txt"
+Output:
+real	0m5.519s
+user	0m0.366s
+sys	0m5.077s
+
+Time for Buffered, Copying File to Terminal:
+Command:
+"time ./tr2b 'abc' 'xyz' < bigfile.txt"
+Output:
+real	0m0.003s
+user	0m0.000s
+sys	0m0.002s
+
+Time for Unbuffered, Copying File to Terminal:
+Command:
+"time ./tr2u 'abc' 'xyz' < bigfile.txt"
+Output:
+real	0m7.406s
+user	0m0.382s
+sys	0m7.011s
+
+As it can be clearly seen, using the buffered program is much faster
+than the using the unbuffered one for the large file, since much fewer
+system calls must be made for buffered systems that are used by the C
+standard library compared to system calls that work on a byte-by-byte
+basis. It is also noted that copying the file to the terminal always uses
+slightly more system calls compared to copying one file to another, since
+some more calls are needed to print to the terminal screen.

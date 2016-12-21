@@ -1,0 +1,70 @@
+Vamsi Mokkapati
+404-464-206
+CS 35L Lab 8
+TA: Sharath Gopal
+
+1.
+Since the current version of GNU sort is in /usr/local/cs/bin, 
+it’s necessary to first set the path accordingly:
+
+“export PATH=/usr/local/cs/bin:$PATH”
+
+2.
+Then I ran “sort --version”, and found that it was from 2015,
+version 8.25, which is recent enough. To generate 10,000,000 
+random double precision floating point numbers, I followed the 
+spec and used the “od” command. After going to its manual, I 
+found its options that can be used. Since there is no address 
+base in this case, I added the flag “-An”. Since we should output 
+double-precision floating point numbers, I added the appropriate 
+flag “-e”. Since I need to dump a certain length of bytes, I used 
+the “-N” flag followed by the number of bytes I need to output, 
+which is 10,000,000. I then made sure the input was taken from 
+/dev/urandom/, and then made sure that there was only one
+number per line by replacing all the white spaces with tabs using
+“tr”. Lastly, I made sure the output was put into a text file,
+which I named “rand_dp_fltpt_num.txt”. The following is the line
+I typed out:
+
+od -An -e -N 10000000 < /dev/urandom | tr -s ' ' '\n' > 
+rand_dp_fltpt_num.txt
+
+3.
+To time the command “sort -g”, I followed the instructions in the
+spec, and made sure the output was set to /dev/null while using
+the options “-g” and “-parallel” on sort. The following is the 
+example code for timing the command using 1 thread:
+
+“time -p sort -g --parallel=1 rand_dp_fltpt_num.txt > /dev/null”
+
+For timing the command for 2, 4, and 8 threads, I simply replaced
+the “1” following the equal sign above with the respective number 
+of threads I wanted to test for. I got the following results:
+
+1 thread:
+real 19.00
+user 18.97
+sys 0.03
+
+2 threads:
+real 10.36
+user 19.78
+sys 0.03
+
+4 threads:
+real 5.93
+user 19.97
+sys 0.07
+
+8 threads:
+real 3.95
+user 20.95
+sys 0.07
+
+Since there is multithreading taking place, the real time gets
+progressively smaller as we use more threads, compared to the
+user time. The user time gets steadily larger, since the CPU has
+to spend more time in user-mode when more threads are used. It’s
+also observed that the CPU has to spend more time in the kernel
+during the process as more threads are being used, as is seen
+by the slightly increasing sys time.

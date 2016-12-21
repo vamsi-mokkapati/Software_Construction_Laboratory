@@ -1,0 +1,51 @@
+Vamsi Mokkapati
+404-464-206
+CS 35L Homework 6
+TA: Sharath Gopal
+
+1.
+If the other teams were observing the bytes going across
+the network, the resulting network is still secure, since
+all the information transferred between computers is 
+encrypted, and the other teams can only view the 
+encrypted data, which is garbage without knowledge of
+the private key. 
+
+However, if the other teams tapped keyboards, then they
+can have access to information such as passphrases and
+passwords, which can compromise security since they now
+have access to the secret key that allows them to
+translate the encrypted data. They have access to 
+information such as passwords, since any information that
+the user provides to the computer is compromised with 
+tapped keyboards.
+
+If the other teams had physical control of a USB off of
+which my team was booting off of, then they now have 
+access to the private key with which they can decrypt
+the data. Therefore, the network security is again 
+compromised, and access to the encrypted key is not 
+garbage like in the first case.
+
+2.
+The gpg --verify command is only meant to check whether
+or not the signature is valid for the given key. It 
+cannot determine who actually created the tar files in
+question that it is verifying. 
+
+The reason for this anomaly is because although it is
+easily possible for the public key to be verified to help
+decrypt the sent code, it is not easy to check to whom the
+public key belongs. For instance, a malicious attacker
+Trudy can intercept an exchange between Alice and Bob by
+simply putting Alice’s signature on a group of files, and
+altering the message that Bob is to receive. Since Trudy
+used the signature belonging to Alice, Bob will think the
+message is unaltered and valid, though it is not.
+
+To fix this problem, a third party company such as 
+VeriSign or Symantec could be utilized for the purpose of
+mapping all individuals with their respective public keys.
+If the company is trusted and reliable, then the receiver
+can find a fraud by verifying through the company if the
+public key is owned by the desired individual. 

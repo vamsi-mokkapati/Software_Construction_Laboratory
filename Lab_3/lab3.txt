@@ -1,0 +1,124 @@
+Vamsi Mokkapati
+404-464-206
+CS 35L Lab 3
+TA: Sharath Gopal
+
+0. “mkdir week3”, “cd week3”
+
+First I made a directory in which I will finish this lab 
+assignment.
+
+1. “ wget "ftp://ftp.gnu.org/gnu/coreutils/coreutils-7.6.tar.gz" ”
+
+I used this command to download the buggy version of Coreutils 7.6.
+
+   “tar -xzvf coreutils-7.6.tar.gz”
+
+I typed this command to unzip the tarball file that has been
+download. the options -
+
+x, -z, -v, and -f stand for extract,
+gzip, verbose, and file, respectively.
+
+2. “mkdir mybuild”, “cd coreutils-7.6”, 
+   “ ./configure --prefix="/u/cs/ugrad/vamsi/week3/mybuild/" ” 
+   “make”
+   “make install”
+
+I made a temporary directory called “mybuild”, and I typed out
+the second command to install my buggy copy of Coreutils into
+mybuild. To compile and install it within my mybuild directory,
+I typed out the third and fourth commands above.
+
+3. “cd ..”
+   “cd mybuild/bin/“
+   “./ls -l /bin/bash” <== COMMAND TO TEST BUGGY LS
+
+   Buggy ls output:
+   -rwxr-xr-x 1 root root 941720 2015-08-17 03:49 /bin/bash
+
+To reproduce the bug, I went into mybuild, found that all the unix
+command directories were in the bin folder, and ran the ls command
+found within my buggy Coreutils. As seen above, the bug is present
+because the date is in the format YYYY-MM-DD instead of the 
+traditional Unix date.
+
+PATH OF THE BUGGY LS EXECUTABLE:
+/u/cs/ugrad/vamsi/week3/mybuild/bin/ls
+
+4. “cd ~/week3/coreutils-7.6”
+   “emacs bradyPatch” (put contents of the patch in bradyPatch)
+   “patch -p1 < bradyPatch”
+
+Now that I reproduced the problem, I first went into the
+coreutils-7.6 directory, made a patch file named bradyPatch that
+contains the contents of Brady’s patch, and applied the patch using
+the third command above. 
+
+PATH OF THE FIXED LS EXECUTABLE:
+/u/cs/ugrad/vamsi/week3/coreutils-7.6/src/ls
+
+While testing, it is evident that both my ls executables existed at 
+the same time, since the buggy version is located in my mybuild/bin 
+directory while the fixed version is located in coreutils-7.6/src.
+
+5. “make”
+   “cd src/“
+   “./ls -l /bin/bash” <== COMMAND TO TEST FIXED LS
+
+   Fixed ls output:
+   -rwxr-xr-x 1 root root 941720 Aug 17  2015 /bin/bash
+
+Now that I know that my modified ls works on my test case, I can
+check that my buggy ls installed within the mybuild directory still
+doesn’t work. To do that, I can change directories back to mybuild/bin,
+and then test my buggy ls executable there:
+
+   “cd ~/week3/mybuild/bin”
+   “./ls -l /bin/bash”
+
+   Buggy ls output again:
+   -rwxr-xr-x 1 root root 941720 2015-08-17 03:49 /bin/bash
+
+When I typed “make”, I found that the command took a significantly
+shorter amount of time to execute, since it doesn’t have to change
+the whole makefile; it found that only the object file ls.o was
+older than the source file by examining timestamps, and therefore
+that was one of the few files it modified after the patch. It found
+that there was “Nothing to be done” for ‘all’ or ‘all-am’. It
+made all in “lib” and “src”, since those were modified after the
+patch was applied.
+
+6. “cd ~/week3/coreutils-7.6/src”
+   “./ls -l /bin/bash” (tests a file that has been recently modified.)
+   “touch -t 201001010000 test_old” (makes a file artificially marked
+                                     as being modified in 2010)
+   “./ls -l test_old”
+
+   Fixed old file output:
+   -rw-r--r-- 1 vamsi csugrad 0 Jan  1  2010 test_old
+
+   “cd ~/week3/mybuild/bin/“
+   “./ls -l /bin/bash”
+   “touch -t 201001010000 test_old2”
+   “./ls -l test_old2”
+
+   Buggy old file output:
+   -rw-r--r-- 1 vamsi csugrad 0 2010-01-01 00:00 test_old2
+
+First, I changed directories into coreutils-7.6/src to test my fixed
+ls executable on a recently modified file (/bin/bash), and an old
+file which I artificially marked to be modified in 2010 using the
+“touch” command. 
+
+Then, I changed directories into mybuild/bin to test my buggy ls
+executable on a recently modified file (/bin/bash), and a second
+old file that I artificially marked again using the “touch” command
+
+The difference between running both my fixed and buggy ls executables
+on a recently modified file and an old file is that the date that is
+displayed changes; for the recently modified file, the date is less than
+one year ago, while the old file, in my case, has a date several years
+ago. The fix by the patch worked correctly, since the date for my old
+file matched the date I intentionally marked on it using the “touch” 
+command.

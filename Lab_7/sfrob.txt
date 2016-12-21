@@ -1,0 +1,219 @@
+Vamsi Mokkapati
+404-464-206
+CS 35L Homework 7
+TA: Sharath Gopal
+
+Here I will compare the running times of the buffered file 
+sfrob.c, the unbuffered file sfrobu.c, and the shell script 
+sfrobs on files containing 11 to 11,000,000 words. I will
+also keep track of the number of comparisons, or 
+frobcmp invocations, for sfrobu.c in order to obtain a 
+relationship for the number of comparisons as a function
+of words in the input file.
+
+Each of the files power1.txt through power7.txt contain
+1 to 1,000,000 lines of text, each line containing the 
+following 11-word sentence:
+"Hello World! My name is Vamsi and I'm finishing Homework 7!"
+
+The following shows the time data I obtained from the 
+three scripts from 7 different file lengths:
+____________________________________________________________
+11 words:
+
+sfrob:
+"time ./sfrob < power1.txt"
+real  0m0.004s
+user  0m0.000s
+sys   0m0.001s
+
+sfrobu:
+"time ./sfrobu < power1.txt"
+real  0m0.004s
+user  0m0.000s
+sys   0m0.001s
+
+sfrobs:
+"time ./sfrobs < power1.txt"
+real  0m0.010s
+user  0m0.004s
+sys   0m0.004s
+____________________________________________________________
+110 words:
+
+sfrob:
+"time ./sfrob < power2.txt"
+real	0m0.002s
+user	0m0.000s
+sys	0m0.001s
+
+sfrobu:
+"time ./sfrobu < power2.txt"
+real	0m0.003s
+user	0m0.000s
+sys	0m0.002s
+
+sfrobs:
+"time ./sfrobs < power2.txt"
+real	0m0.009s
+user	0m0.002s
+sys	0m0.005s
+____________________________________________________________
+1100 words:
+
+sfrob:
+"time ./sfrob < power3.txt"
+real  0m0.003s
+user  0m0.002s
+sys   0m0.000s
+
+sfrobu:
+"time ./sfrobu < power3.txt"
+real  0m0.013s
+user  0m0.001s
+sys   0m0.011s
+
+sfrobs:
+"time ./sfrobs < power3.txt"
+real  0m0.010s
+user  0m0.001s
+sys   0m0.007s
+____________________________________________________________
+11,000 words:
+
+sfrob:
+"time ./sfrob < power4.txt"
+real  0m0.017s
+user  0m0.012s
+sys   0m0.002s
+
+sfrobu:
+"time ./sfrobu < power4.txt"
+real  0m0.080s
+user  0m0.008s
+sys   0m0.069s
+
+sfrobs:
+"time ./sfrobs < power4.txt"
+real  0m0.017s
+user  0m0.009s
+sys   0m0.006s
+____________________________________________________________
+110,000 words:
+
+sfrob:
+"time ./sfrob < power5.txt"
+real  0m0.123s
+user  0m0.085s
+sys   0m0.013s
+
+sfrobu:
+"time ./sfrobu < power5.txt"
+real  0m0.808s
+user  0m0.096s
+sys   0m0.710s
+
+sfrobs:
+"time ./sfrobs < power5.txt"
+real  0m0.095s
+user  0m0.042s
+sys   0m0.021s
+____________________________________________________________
+1,100,000 words:
+
+sfrob:
+"time ./sfrob < power6.txt"
+real  0m4.550s
+user  0m0.919s
+sys   0m0.201s
+
+sfrobu:
+"time ./sfrobu < power6.txt"
+real  0m8.301s
+user  0m1.004s
+sys   0m7.291s
+
+sfrobs:
+"time ./sfrobs < power6.txt"
+real  0m4.304s
+user  0m0.439s
+sys   0m0.180s
+____________________________________________________________
+11,000,000 words:
+
+sfrob:
+"time ./sfrob < power7.txt"
+real  0m34.792s
+user  0m10.392s
+sys   0m1.995s
+
+sfrobu:
+"time ./sfrobu < power7.txt"
+real  1m26.114s
+user  0m11.393s
+sys   1m13.634s
+
+sfrobs:
+"time ./sfrobs < power7.txt"
+real  0m32.313s
+user  0m4.893s
+sys   0m2.327s
+____________________________________________________________
+
+After keeping track of the number of comparisons outputted
+by my sfrobu.c for each file, I obtained the following data:
+
+Number of words:   Number of sfrobu Comparisons:
+11     	  	   28
+110		   557
+1100		   8,616
+11,000		   117,955
+110,000		   1,495,346
+1,100,000	   18,079,330
+11,000,000	   212,496,049
+
+After using Excel to graph the number of comparisons as a 
+function of the number of words, I saw a clearly linear
+relationship, and was able to obtain a function to estimate
+this relation using regression techniques.
+
+Number of Comparisons (y) as a Function of Words in File (x)
+for the phrase "Hello World! My name is Vamsi and I'm finishing 
+Homework 7!":
+
+y = 19.3411x - 524,221
+
+The linear regression coefficient r^2 = 0.99978, which 
+illustrates a strong linear relationship between the number of
+comparisons and words. This function tells us that as the file
+size increases, the number of sfrobu comparisons will be
+at an upper bound of roughly 20 times the number of words 
+in the file.
+____________________________________________________________
+
+The timing data above shows us that although the real time
+difference between sfrob and sfrobu is negligible for word 
+sizes in the hundreds and below, the difference becomes
+more pronouced as the word size reaches the hundred
+thousands and millions. What is especially noticeable is
+sfrobu's drastically higher sys time, which is caused by
+the fact that it spends a lot more time in the kernel 
+mode due to the fact that it requires a lot more system
+calls. This increase in system calls is caused by the 
+lack of any buffering mechanism in sfrobu, which is found 
+in sfrob since the latter uses C standard library functions 
+such as getchar and putchar which have buffering optimizations
+built in. Meanwhile, sfrobu's read and write system calls only
+work one byte at a time, and therefore the result is a noticeable
+performance reduction, especially for larger file sizes.
+
+When looking at the performance of sfrobs, we find that in
+general, it performs slower than sfrob. This can be attributed
+to the fact that bash is a scripting language, which is inherent-
+ly slower than compiled languages. Also, the extensive use of
+pipes in my script further hinders sfrobs's performance since
+it requires large amounts of data to be input and output multiple
+times. However, the generally advanced optimization techniques
+used in shell commands keep the script running at a comparable
+time to sfrob in general, and it's noticed that for the last few
+test cases, sfrobs even outperforms sfrob by a small margin!
